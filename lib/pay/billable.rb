@@ -27,46 +27,36 @@ module Pay
       attribute :plan, :string
       attribute :quantity, :integer
       attribute :card_token, :string
+
+      # Save old customer IDs
+      store_accessor :pay_data, :stripe_id
     end
+
+    def payment_processor
+      @payment_processor ||= payment_processor_for(processor).new(self)
+    end
+
+    def payment_process_for(name)
+      "Pay::Processors::#{name.classify}".constantize
+    end
+
+    delegate :customer, :charge, :subscribe, :update_card, to: :payment_processor
 
     def processor=(value)
       super(value)
+
+      # Cleans up old processor ID when you switch payment processors
       self.processor_id = nil if processor_changed?
-    end
-
-    def customer
-      check_for_processor
-      raise Pay::Error, "Email is required to create a customer" if email.nil?
-
-      customer = send("#{processor}_customer")
-      update_card(card_token) if card_token.present?
-      customer
     end
 
     def customer_name
       [try(:first_name), try(:last_name)].compact.join(" ")
     end
 
-    def charge(amount_in_cents, options = {})
-      check_for_processor
-      send("create_#{processor}_charge", amount_in_cents, options)
-    end
-
-    def subscribe(name: "default", plan: "default", **options)
-      check_for_processor
-      send("create_#{processor}_subscription", name, plan, options)
-    end
-
-    def update_card(token)
-      check_for_processor
-      customer if processor_id.nil?
-      send("update_#{processor}_card", token)
-    end
-
     def on_trial?(name: "default", plan: nil)
       return true if default_generic_trial?(name, plan)
 
-      sub = subscription(name: name)
+      sub = payment_processor.subscription(name: name)
       return sub&.on_trial? if plan.nil?
 
       sub&.on_trial? && sub.processor_plan == plan
@@ -74,11 +64,6 @@ module Pay
 
     def on_generic_trial?
       trial_ends_at? && trial_ends_at > Time.zone.now
-    end
-
-    def processor_subscription(subscription_id, options = {})
-      check_for_processor
-      send("#{processor}_subscription", subscription_id, options)
     end
 
     def subscribed?(name: "default", processor_plan: nil)
@@ -95,6 +80,7 @@ module Pay
         subscribed?(name: name, processor_plan: processor_plan)
     end
 
+    # Returns Pay::Subscription
     def subscription(name: "default")
       subscriptions.for_name(name).last
     end
@@ -107,20 +93,8 @@ module Pay
       send("#{processor}_upcoming_invoice")
     end
 
-    def stripe?
-      processor == "stripe"
-    end
-
-    def braintree?
-      processor == "braintree"
-    end
-
-    def paypal?
-      braintree? && card_type == "PayPal"
-    end
-
-    def paddle?
-      processor == "paddle"
+    def processor
+      super.inquiry
     end
 
     def has_incomplete_payment?(name: "default")

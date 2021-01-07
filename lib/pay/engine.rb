@@ -1,23 +1,4 @@
 # frozen_string_literal: true
-
-# rubocop:disable Lint/HandleExceptions
-begin
-  require "braintree"
-rescue LoadError
-end
-
-begin
-  require "stripe"
-  require "stripe_event"
-rescue LoadError
-end
-
-begin
-  require "paddle_pay"
-rescue LoadError
-end
-# rubocop:enable Lint/HandleExceptions
-
 module Pay
   class Engine < ::Rails::Engine
     engine_name "pay"

@@ -1,9 +1,33 @@
 require "pay/engine"
 require "pay/billable"
 require "pay/receipts"
-require "pay/payment"
+
+# rubocop:disable Lint/HandleExceptions
+begin
+  require "braintree"
+rescue LoadError
+end
+
+begin
+  require "stripe"
+  require "stripe_event"
+rescue LoadError
+end
+
+begin
+  require "paddle_pay"
+rescue LoadError
+end
+# rubocop:enable Lint/HandleExceptions
 
 module Pay
+  autoload :Payment, "pay/payment"
+
+  module Processors
+    autoload :Base, "pay/processors/base"
+    autoload :Stripe, "pay/processors/stripe"
+  end
+
   # Define who owns the subscription
   mattr_accessor :billable_class
   mattr_accessor :billable_table
