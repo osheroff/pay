@@ -24,8 +24,21 @@ module Pay
   autoload :Payment, "pay/payment"
 
   module Processors
-    autoload :Base, "pay/processors/base"
-    autoload :Stripe, "pay/processors/stripe"
+    autoload :Billable, "pay/processors/billable"
+    autoload :Charge, "pay/processors/charge"
+    autoload :Subscription, "pay/processors/subscription"
+
+    module Stripe
+      autoload :Billable, "pay/processors/stripe/billable"
+      autoload :Charge, "pay/processors/stripe/charge"
+      autoload :Subscription, "pay/processors/stripe/subscription"
+    end
+
+    module Pay
+      autoload :Billable, "pay/processors/pay/billable"
+      autoload :Charge, "pay/processors/pay/charge"
+      autoload :Subscription, "pay/processors/pay/subscription"
+    end
   end
 
   # Define who owns the subscription

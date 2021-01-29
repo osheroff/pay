@@ -1,3 +1,5 @@
+#TODO: Remove this file
+
 module Pay
   module Stripe
     module Billable
@@ -7,52 +9,15 @@ module Pay
         scope :stripe, -> { where(processor: :stripe) }
       end
 
-
-
-      # Handles Billable#charge
-      #
-      # Returns Pay::Charge
-
-      # Handles Billable#subscribe
-      #
-      # Returns Pay::Subscription
-
-
-      # Handles Billable#update_card
-      #
-      # Returns true if successful
-      def update_stripe_card(payment_method_id)
-        customer = stripe_customer
-
-        return true if payment_method_id == customer.invoice_settings.default_payment_method
-
-        payment_method = ::Stripe::PaymentMethod.attach(payment_method_id, customer: customer.id)
-        ::Stripe::Customer.update(customer.id, invoice_settings: {default_payment_method: payment_method.id})
-
-        update_stripe_card_on_file(payment_method.card)
-        true
-      rescue ::Stripe::StripeError => e
-        raise Error, e.message
-      end
-
-      def update_stripe_email!
-        customer = stripe_customer
-        customer.email = email
-        customer.name = customer_name
-        customer.save
-      end
-
       def stripe_subscription(subscription_id, options = {})
         ::Stripe::Subscription.retrieve(options.merge(id: subscription_id))
       end
 
       def stripe_invoice!(options = {})
         return unless processor_id?
-        ::Stripe::Invoice.create(options.merge(customer: processor_id)).pay
       end
 
       def stripe_upcoming_invoice
-        ::Stripe::Invoice.upcoming(customer: processor_id)
       end
 
       # Used by webhooks when the customer or source changes

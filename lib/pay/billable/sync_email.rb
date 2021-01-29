@@ -23,7 +23,7 @@ module Pay
       end
 
       def sync_email_with_processor
-        send("update_#{processor}_email!")
+        payment_processor.sync_customer
       end
 
       private

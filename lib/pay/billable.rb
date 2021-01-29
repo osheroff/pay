@@ -24,12 +24,15 @@ module Pay
       has_many :charges, class_name: Pay.chargeable_class, foreign_key: :owner_id, inverse_of: :owner, as: :owner
       has_many :subscriptions, class_name: Pay.subscription_class, foreign_key: :owner_id, inverse_of: :owner, as: :owner
 
+      # Convenience methods so you can assign these fields
       attribute :plan, :string
       attribute :quantity, :integer
-      attribute :card_token, :string
+      attribute :payment_method_token, :string
 
       # Save old customer IDs
       store_accessor :pay_data, :stripe_id
+      store_accessor :pay_data, :braintree_id
+      store_accessor :pay_data, :paddle_id
     end
 
     def payment_processor
@@ -37,17 +40,24 @@ module Pay
     end
 
     def payment_process_for(name)
-      "Pay::Processors::#{name.classify}".constantize
+      "Pay::Processors::#{name.classify}::Billable".constantize
     end
 
-    delegate :customer, :charge, :subscribe, :update_card, to: :payment_processor
-
+    # Reset the payment processor when it changes
     def processor=(value)
       super(value)
-
-      # Cleans up old processor ID when you switch payment processors
-      self.processor_id = nil if processor_changed?
+      @payment_processor = nil
     end
+
+    def processor
+      super.inquiry
+    end
+
+    # Primary interface to interact with
+    delegate :customer, to: :payment_processor
+    delegate :charge, to: :payment_processor
+    delegate :subscribe, to: :payment_processor
+    delegate :update_payment_method, to: :payment_processor
 
     def customer_name
       [try(:first_name), try(:last_name)].compact.join(" ")
@@ -85,41 +95,10 @@ module Pay
       subscriptions.for_name(name).last
     end
 
-    def invoice!(options = {})
-      send("#{processor}_invoice!", options)
-    end
-
-    def upcoming_invoice
-      send("#{processor}_upcoming_invoice")
-    end
-
-    def processor
-      super.inquiry
-    end
-
-    def has_incomplete_payment?(name: "default")
-      subscription(name: name)&.has_incomplete_payment?
-    end
-
     private
 
     def check_for_processor
       raise StandardError, "No payment processor selected. Make sure to set the #{self.class.name}'s `processor` attribute to either 'stripe' or 'braintree'." unless processor
-    end
-
-    # Used for creating a Pay::Subscription in the database
-    def create_subscription(subscription, processor, name, plan, options = {})
-      options[:quantity] ||= 1
-
-      options.merge!(
-        name: name || "default",
-        processor: processor,
-        processor_id: subscription.id,
-        processor_plan: plan,
-        trial_ends_at: send("#{processor}_trial_end_date", subscription),
-        ends_at: nil
-      )
-      subscriptions.create!(options)
     end
 
     def default_generic_trial?(name, plan)
