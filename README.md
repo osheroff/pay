@@ -31,10 +31,9 @@ gem 'pay', '~> 2.0'
 
 # To use Stripe, also include:
 gem 'stripe', '< 6.0', '>= 2.8'
-gem 'stripe_event', '~> 2.3'
 
 # To use Braintree + PayPal, also include:
-gem 'braintree', '< 3.0', '>= 2.92.0'
+gem 'braintree', '< 4.0', '>= 3.2.0'
 
 # To use Paddle, also include:
 gem 'paddle_pay', '~> 0.0.1'

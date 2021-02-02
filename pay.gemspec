@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
   s.version = Pay::VERSION
   s.authors = ["Jason Charnes", "Chris Oliver"]
   s.email = ["jason@thecharnes.com", "excid3@gmail.com"]
-  s.homepage = "https://github.com/jasoncharnes/pay"
+  s.homepage = "https://github.com/pay-rails/pay"
   s.summary = "A Ruby on Rails subscription engine."
   s.description = "A Ruby on Rails subscription engine."
   s.license = "MIT"
