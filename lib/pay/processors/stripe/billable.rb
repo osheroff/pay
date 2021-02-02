@@ -3,6 +3,12 @@ module Pay
     module Stripe
       class Billable < Processors::Billable
 
+        def initialize(billable)
+          super
+
+          raise StandardError, "Add Stripe to your Gemfile to use the Stripe payment processor. `bundle add stripe`" unless defined?(::Stripe)
+        end
+
         def customer
           if processor_id?
             ::Stripe::Customer.retrieve(processor_id)
