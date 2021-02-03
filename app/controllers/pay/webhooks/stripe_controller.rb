@@ -8,8 +8,9 @@ module Pay
       include Env
 
       def create
-        verified_event
-        # TODO: Delegate to class
+        event = verified_event
+        klass = class_for_event(event)
+        klass.new.call(event) if klass
         head :ok
       rescue ::Stripe::SignatureVerificationError => e
         log_error(e)
@@ -17,6 +18,58 @@ module Pay
       end
 
       private
+
+      def delegate_event(event)
+        case event.type
+          # Listen to the charge event to make sure we get non-subscription
+          # purchases as well. Invoice is only for subscriptions and manual creation
+          # so it does not include individual charges.
+        when "charge.succeeded"
+          Pay::Stripe::Webhooks::ChargeSucceeded.new
+        when "charge.refunded"
+          Pay::Stripe::Webhooks::ChargeRefunded.new
+
+          # Warn user of upcoming charges for their subscription. This is handy for
+          # notifying annual users their subscription will renew shortly.
+          # This probably should be ignored for monthly subscriptions.
+        when "invoice.upcoming"
+          Pay::Stripe::Webhooks::SubscriptionRenewing.new
+
+          # Payment action is required to process an invoice
+        when "invoice.payment_action_required"
+          Pay::Stripe::Webhooks::PaymentActionRequired.new
+
+          # If a subscription is manually created on Stripe, we want to sync
+        when "customer.subscription.created"
+          Pay::Stripe::Webhooks::SubscriptionCreated.new
+
+          # If the plan, quantity, or trial ending date is updated on Stripe, we want to sync
+        when "customer.subscription.updated"
+          Pay::Stripe::Webhooks::SubscriptionUpdated.new
+
+          # When a customers subscription is canceled, we want to update our records
+        when "customer.subscription.deleted"
+          Pay::Stripe::Webhooks::SubscriptionDeleted.new
+
+          # Monitor changes for customer's default card changing
+        when "customer.updated"
+          Pay::Stripe::Webhooks::CustomerUpdated.new
+
+          # If a customer was deleted in Stripe, their subscriptions should be cancelled
+        when "customer.deleted"
+          Pay::Stripe::Webhooks::CustomerDeleted.new
+
+          # If a customer's payment source was deleted in Stripe, we should update as well
+        when "payment_method.attached"
+          Pay::Stripe::Webhooks::PaymentMethodUpdated.new
+        when "payment_method.updated"
+          Pay::Stripe::Webhooks::PaymentMethodUpdated.new
+        when "payment_method.card_automatically_updated"
+          Pay::Stripe::Webhooks::PaymentMethodUpdated.new
+        when "payment_method.detached"
+          Pay::Stripe::Webhooks::PaymentMethodUpdated.new
+        end
+      end
 
       def verified_event
         payload          = request.body.read
