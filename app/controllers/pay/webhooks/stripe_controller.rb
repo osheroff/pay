@@ -5,8 +5,6 @@ module Pay
         skip_before_action :verify_authenticity_token
       end
 
-      include Env
-
       def create
         event = verified_event
         klass = class_for_event(event)
@@ -87,11 +85,9 @@ module Pay
       end
 
       def secrets(payload, signature)
-        secret = find_value_by_name(:stripe, :signing_secret)
+        secret = Pay::Processors::Stripe.signing_secret
         return secret if secret
-        raise Pay::Error.new(
-                "Cannot verify signature without a Stripe signing secret",
-                signature, http_body: payload)
+        raise Pay::Error.new("Cannot verify signature without a Stripe signing secret", signature, http_body: payload)
       end
 
       def log_error(e)
