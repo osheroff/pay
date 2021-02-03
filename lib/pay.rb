@@ -1,27 +1,9 @@
-require "pay/engine"
-require "pay/billable"
-require "pay/receipts"
-
-# rubocop:disable Lint/HandleExceptions
-begin
-  require "braintree"
-rescue LoadError
-end
-
-begin
-  require "stripe"
-  require "stripe_event"
-rescue LoadError
-end
-
-begin
-  require "paddle_pay"
-rescue LoadError
-end
-# rubocop:enable Lint/HandleExceptions
-
 module Pay
+  autoload :Billable, "pay/billable"
+  autoload :Env, "pay/env"
+  autoload :Engine, "pay/engine"
   autoload :Payment, "pay/payment"
+  autoload :Receipts, "pay/receipts"
 
   module Processors
     autoload :Billable, "pay/processors/billable"
