@@ -1,3 +1,5 @@
+require "pay/version"
+
 module Pay
   autoload :Billable, "pay/billable"
   autoload :Env, "pay/env"
