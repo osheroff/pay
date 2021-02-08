@@ -9,12 +9,7 @@ module Pay
         ::Stripe.api_key = private_key
         ::Stripe.api_version = "2020-08-27"
         ::StripeEvent.signing_secret = signing_secret
-        ::Stripe.set_app_info(
-          "PayRails",
-          partner_id: "pp_partner_XXXX", # Used by Stripe to identify your plugin
-          version: Pay::VERSION,
-          url: "https://github.com/pay-rails/pay"
-        )
+        ::Stripe.set_app_info("PayRails", partner_id: "pp_partner_IqhY0UExnJYLxg", version: Pay::VERSION, url: "https://github.com/pay-rails/pay")
       end
 
       def public_key
