@@ -2,7 +2,6 @@ module Pay
   module Processors
     module Stripe
       class Billable < Processors::Billable
-
         def initialize(billable)
           super
 
@@ -51,7 +50,7 @@ module Pay
         end
 
         def subscribe(name, plan, options = {})
-          quantity = options.delete(:quantity) || 1
+          quantity = options.fetch(:quantity, 1)
           opts = {
             expand: ["pending_setup_intent", "latest_invoice.payment_intent"],
             items: [plan: plan, quantity: quantity],
@@ -119,7 +118,6 @@ module Pay
         def has_incomplete_payment?(name: "default")
           subscription(name: name)&.has_incomplete_payment?
         end
-
       end
     end
   end

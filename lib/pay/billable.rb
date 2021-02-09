@@ -1,5 +1,3 @@
-require "pay/billable/sync_email"
-
 module Pay
   module Billable
     extend ActiveSupport::Concern
@@ -17,9 +15,6 @@ module Pay
 
     included do |base|
       include Pay::Billable::SyncEmail
-      include Pay::Stripe::Billable if defined? ::Stripe
-      include Pay::Braintree::Billable if defined? ::Braintree
-      include Pay::Paddle::Billable if defined? ::PaddlePay
 
       has_many :charges, class_name: Pay.chargeable_class, foreign_key: :owner_id, inverse_of: :owner, as: :owner
       has_many :subscriptions, class_name: Pay.subscription_class, foreign_key: :owner_id, inverse_of: :owner, as: :owner
@@ -92,7 +87,7 @@ module Pay
 
     # Returns Pay::Subscription
     def subscription(name: "default")
-      subscriptions.for_name(name).last
+      payment_processor.subscriptions.for_name(name).last
     end
 
     private

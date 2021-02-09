@@ -1,5 +1,5 @@
 module Pay
-  class Charge < ApplicationRecord
+  class Charge < Pay::ApplicationRecord
     self.table_name = Pay.chargeable_table
 
     # Only serialize for non-json columns

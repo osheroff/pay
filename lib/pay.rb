@@ -1,29 +1,12 @@
+require "pay/engine"
+require "pay/errors"
 require "pay/version"
 
 module Pay
   autoload :Billable, "pay/billable"
   autoload :Env, "pay/env"
-  autoload :Engine, "pay/engine"
   autoload :Payment, "pay/payment"
   autoload :Receipts, "pay/receipts"
-
-  module Processors
-    autoload :Billable, "pay/processors/billable"
-    autoload :Charge, "pay/processors/charge"
-    autoload :Subscription, "pay/processors/subscription"
-
-    module Stripe
-      autoload :Billable, "pay/processors/stripe/billable"
-      autoload :Charge, "pay/processors/stripe/charge"
-      autoload :Subscription, "pay/processors/stripe/subscription"
-    end
-
-    module Pay
-      autoload :Billable, "pay/processors/pay/billable"
-      autoload :Charge, "pay/processors/pay/charge"
-      autoload :Subscription, "pay/processors/pay/subscription"
-    end
-  end
 
   # Define who owns the subscription
   mattr_accessor :billable_class
@@ -89,16 +72,6 @@ module Pay
     nil
   end
 
-  def self.user_model
-    ActiveSupport::Deprecation.warn("Pay.user_model is deprecated and will be removed in v3. Instead, use `Pay.billable_models` now to support more than one billable model.")
-
-    if Rails.application.config.cache_classes
-      @@user_model ||= billable_class.constantize
-    else
-      billable_class.constantize
-    end
-  end
-
   def self.charge_model
     if Rails.application.config.cache_classes
       @@charge_model ||= chargeable_class.constantize
@@ -121,46 +94,5 @@ module Pay
       business_name &&
       business_address &&
       support_email
-  end
-
-  class Error < StandardError
-  end
-
-  class BraintreeError < Error
-    attr_reader :result
-
-    def initialize(result = nil)
-      @result = result
-    end
-  end
-
-  class BraintreeAuthorizationError < BraintreeError
-    def message
-      "Either the data you submitted is malformed and does not match the API or the API key you used may not be authorized to perform this action."
-    end
-  end
-
-  class InvalidPaymentMethod < Error
-    attr_reader :payment
-
-    def initialize(payment)
-      @payment = payment
-    end
-
-    def message
-      "This payment attempt failed because of an invalid payment method."
-    end
-  end
-
-  class ActionRequired < Error
-    attr_reader :payment
-
-    def initialize(payment)
-      @payment = payment
-    end
-
-    def message
-      "This payment attempt failed because additional action is required before it can be completed."
-    end
   end
 end

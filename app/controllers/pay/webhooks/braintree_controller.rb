@@ -8,58 +8,20 @@ module Pay
       def create
         case webhook_notification.kind
         when "subscription_charged_successfully"
-          subscription_charged_successfully(webhook_notification)
+          Pay::Webhooks::Braintree::SubscriptionChargedSuccessfully.new.call(webhook_notification)
         when "subscription_canceled"
-          subscription_canceled(webhook_notification)
+          Pay::Webhooks::Braintree::SubscriptionCanceled.new.call(webhook_notification)
         when "subscription_trial_ended"
+          Pay::Webhooks::Braintree::SubscriptionTrialEnded.new.call(webhook_notification)
           subscription_trial_ended(webhook_notification)
         end
 
-        render json: {success: true}, status: :ok
-      rescue ::Braintree::InvalidSignature
         head :ok
+      rescue ::Braintree::InvalidSignature
+        head :bad_request
       end
 
       private
-
-      def subscription_charged_successfully(event)
-        subscription = event.subscription
-        return if subscription.nil?
-
-        pay_subscription = Pay.subscription_model.find_by(processor: :braintree, processor_id: subscription.id)
-        return unless pay_subscription.present?
-
-        billable = pay_subscription.owner
-        charge = billable.save_braintree_transaction(subscription.transactions.first)
-
-        if Pay.send_emails
-          Pay::UserMailer.receipt(billable, charge).deliver_later
-        end
-      end
-
-      def subscription_canceled(event)
-        subscription = event.subscription
-        return if subscription.nil?
-
-        pay_subscription = Pay.subscription_model.find_by(processor: :braintree, processor_id: subscription.id)
-        return unless pay_subscription.present?
-
-        billable = pay_subscription.owner
-        return if billable.nil?
-
-        # User canceled or failed to make payments
-        billable.update(braintree_subscription_id: nil)
-      end
-
-      def subscription_trial_ended(event)
-        subscription = event.subscription
-        return if subscription.nil?
-
-        pay_subscription = Pay.subscription_model.find_by(processor: :braintree, processor_id: subscription.id)
-        return unless pay_subscription.present?
-
-        pay_subscription.update(trial_ends_at: Time.zone.now)
-      end
 
       def webhook_notification
         @webhook_notification ||= Pay.braintree_gateway.webhook_notification.parse(

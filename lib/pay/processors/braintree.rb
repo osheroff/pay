@@ -1,0 +1,34 @@
+module Pay
+  module Processors
+    module Braintree
+      include Env
+
+      extend self
+
+      def setup
+        Pay.braintree_gateway = ::Braintree::Gateway.new(
+          environment: environment.to_sym,
+          merchant_id: merchant_id,
+          public_key: public_key,
+          private_key: private_key
+        )
+      end
+
+      def public_key
+        find_value_by_name(:braintree, :public_key)
+      end
+
+      def private_key
+        find_value_by_name(:braintree, :private_key)
+      end
+
+      def merchant_id
+        find_value_by_name(:braintree, :merchant_id)
+      end
+
+      def environment
+        find_value_by_name(:braintree, :environment) || "sandbox"
+      end
+    end
+  end
+end

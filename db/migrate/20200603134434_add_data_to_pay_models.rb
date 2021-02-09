@@ -5,7 +5,7 @@ class AddDataToPayModels < ActiveRecord::Migration[4.2]
   end
 
   def data_column_type
-    case ActiveRecord::Base.configurations.default_hash.dig("adapter")
+    case ActiveRecord::Base.configurations.configs_for(Rails.env).dig("adapter")
     when "mysql2"
       :json
     when "postgresql"

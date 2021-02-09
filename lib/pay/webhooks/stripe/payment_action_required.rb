@@ -1,0 +1,26 @@
+module Pay
+  module Webhooks
+    module Stripe
+      class PaymentActionRequired
+        def call(event)
+          # Event is of type "invoice" see:
+          # https://stripe.com/docs/api/invoices/object
+
+          object = event.data.object
+
+          subscription = Pay.subscription_model.find_by(processor: :stripe, processor_id: object.subscription)
+          return if subscription.nil?
+          billable = subscription.owner
+
+          notify_user(billable, event.data.object.payment_intent, subscription)
+        end
+
+        def notify_user(billable, payment_intent_id, subscription)
+          if Pay.send_emails
+            Pay::UserMailer.payment_action_required(billable, payment_intent_id, subscription).deliver_later
+          end
+        end
+      end
+    end
+  end
+end

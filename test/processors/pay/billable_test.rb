@@ -1,6 +1,6 @@
 require "test_helper"
 
-class Pay::Processors::Pay::Billable::Test < ActiveSupport::TestCase
+class Pay::ProcessorsPayBillableTest < ActiveSupport::TestCase
   setup do
     @billable = User.new email: "gob@bluth.com"
     @processor = Pay::Processors::Pay::Billable.new(@billable)

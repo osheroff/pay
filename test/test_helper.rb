@@ -1,11 +1,10 @@
 # Configure Rails Environment
 ENV["RAILS_ENV"] = "test"
-
-# Disable warnings locally
 $VERBOSE = ENV["CI"]
 
-require File.expand_path("dummy/config/environment.rb", __dir__)
-ActiveRecord::Migrator.migrations_paths = [File.expand_path("dummy/db/migrate", __dir__), File.expand_path("../db/migrate", __dir__)]
+require_relative "../test/dummy/config/environment"
+ActiveRecord::Migrator.migrations_paths = [File.expand_path("dummy/db/migrate", __dir__)]
+
 require "rails/test_help"
 require "minitest/rails"
 require "byebug"
@@ -13,7 +12,6 @@ require "byebug"
 # Processors for testing
 require "braintree"
 require "stripe"
-require "stripe_event"
 require "paddle_pay"
 
 # Filter out Minitest backtrace while allowing backtrace from other libraries

@@ -6,30 +6,31 @@ module Pay
       end
 
       def create
-        verifier = Pay::Paddle::Webhooks::SignatureVerifier.new(check_params.as_json)
+        verifier = Pay::Paddle::Webhooks::SignatureVerifier.new(check_params)
         if verifier.verify
           case params["alert_name"]
           when "subscription_created"
-            Pay::Paddle::Webhooks::SubscriptionCreated.new(check_params.as_json)
+            Pay::Paddle::Webhooks::SubscriptionCreated.new(check_params)
           when "subscription_updated"
-            Pay::Paddle::Webhooks::SubscriptionUpdated.new(check_params.as_json)
+            Pay::Paddle::Webhooks::SubscriptionUpdated.new(check_params)
           when "subscription_cancelled"
-            Pay::Paddle::Webhooks::SubscriptionCancelled.new(check_params.as_json)
+            Pay::Paddle::Webhooks::SubscriptionCancelled.new(check_params)
           when "subscription_payment_succeeded"
-            Pay::Paddle::Webhooks::SubscriptionPaymentSucceeded.new(check_params.as_json)
+            Pay::Paddle::Webhooks::SubscriptionPaymentSucceeded.new(check_params)
           when "subscription_payment_refunded"
-            Pay::Paddle::Webhooks::SubscriptionPaymentRefunded.new(check_params.as_json)
+            Pay::Paddle::Webhooks::SubscriptionPaymentRefunded.new(check_params)
           end
-          render json: {success: true}, status: :ok
-        else
+
           head :ok
+        else
+          head :bad_request
         end
       end
 
       private
 
       def check_params
-        params.except(:action, :controller).permit!
+        @check_params ||= params.except(:action, :controller).permit!.as_json
       end
     end
   end
