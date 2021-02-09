@@ -6,7 +6,7 @@ module Pay
       end
 
       def create
-        verifier = Pay::Paddle::Webhooks::SignatureVerifier.new(check_params)
+        verifier = Pay::Webhooks::Paddle::SignatureVerifier.new(check_params)
         if verifier.verify
           case params["alert_name"]
           when "subscription_created"

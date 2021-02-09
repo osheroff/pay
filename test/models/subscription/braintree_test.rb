@@ -4,7 +4,7 @@ class Pay::Subscription::BraintreeTest < ActiveSupport::TestCase
   setup do
     @billable = User.new email: "test@example.com"
     @billable.processor = "braintree"
-    @billable.card_token = "fake-valid-visa-nonce"
+    @billable.payment_method_token = "fake-valid-visa-nonce"
   end
 
   test "braintree cancel" do

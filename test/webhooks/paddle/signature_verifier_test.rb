@@ -6,7 +6,7 @@ class Pay::PaddleWebhooksSubscriptionCreatedTest < ActiveSupport::TestCase
   end
 
   test "webhook signature is verified correctly" do
-    verifier = Pay::Paddle::Webhooks::SignatureVerifier.new(@data)
+    verifier = Pay::Webhooks::Paddle::SignatureVerifier.new(@data)
     assert verifier.verify
   end
 end

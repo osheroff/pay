@@ -29,6 +29,10 @@ module Pay
 
     attribute :prorate, :boolean, default: true
 
+    # TODO: Include these with a module
+    store_accessor :data, :paddle_update_url
+    store_accessor :data, :paddle_cancel_url
+
     def no_prorate
       self.prorate = false
     end

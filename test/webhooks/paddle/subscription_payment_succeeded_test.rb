@@ -10,7 +10,7 @@ class Pay::PaddleWebhooksSubscriptionPaymentSucceededTest < ActiveSupport::TestC
 
     assert_difference "Pay.charge_model.count" do
       PaddlePay::Subscription::User.stubs(:list).returns(:nil)
-      Pay::Paddle::Webhooks::SubscriptionPaymentSucceeded.new(@data)
+      Pay::Webhooks::Paddle::SubscriptionPaymentSucceeded.new(@data)
     end
 
     charge = Pay.charge_model.last
@@ -39,7 +39,7 @@ class Pay::PaddleWebhooksSubscriptionPaymentSucceededTest < ActiveSupport::TestC
 
     assert_difference "Pay.charge_model.count" do
       PaddlePay::Subscription::User.stubs(:list).returns([subscription_user])
-      Pay::Paddle::Webhooks::SubscriptionPaymentSucceeded.new(@data)
+      Pay::Webhooks::Paddle::SubscriptionPaymentSucceeded.new(@data)
     end
 
     charge = Pay.charge_model.last
@@ -69,7 +69,7 @@ class Pay::PaddleWebhooksSubscriptionPaymentSucceededTest < ActiveSupport::TestC
 
     assert_difference "Pay.charge_model.count" do
       PaddlePay::Subscription::User.stubs(:list).returns([subscription_user])
-      Pay::Paddle::Webhooks::SubscriptionPaymentSucceeded.new(@data)
+      Pay::Webhooks::Paddle::SubscriptionPaymentSucceeded.new(@data)
     end
 
     charge = Pay.charge_model.last
@@ -83,7 +83,7 @@ class Pay::PaddleWebhooksSubscriptionPaymentSucceededTest < ActiveSupport::TestC
     @user = User.create!(email: "gob@bluth.com", processor: :paddle, processor_id: "does-not-exist")
 
     assert_no_difference "Pay.charge_model.count" do
-      Pay::Paddle::Webhooks::SubscriptionPaymentSucceeded.new(@data)
+      Pay::Webhooks::Paddle::SubscriptionPaymentSucceeded.new(@data)
     end
   end
 
@@ -93,7 +93,7 @@ class Pay::PaddleWebhooksSubscriptionPaymentSucceededTest < ActiveSupport::TestC
     @user.charges.create!(amount: 100, processor: :paddle, processor_id: @data["subscription_payment_id"], card_type: @data["payment_method"])
 
     assert_no_difference "Pay.charge_model.count" do
-      Pay::Paddle::Webhooks::SubscriptionPaymentSucceeded.new(@data)
+      Pay::Webhooks::Paddle::SubscriptionPaymentSucceeded.new(@data)
     end
   end
 end

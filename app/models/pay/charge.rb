@@ -18,6 +18,20 @@ module Pay
     validates :processor_id, presence: true
     validates :card_type, presence: true
 
+    store_accessor :data, :paddle_receipt_url
+
+    def payment_processor
+      @payment_processor ||= payment_processor_for(processor).new(self)
+    end
+
+    def payment_processor_for(name)
+      "Pay::Processors::#{name.to_s.classify}::Charge".constantize
+    end
+
+    def processor
+      super.inquiry
+    end
+
     def processor_charge
       send("#{processor}_charge")
     end
@@ -29,22 +43,6 @@ module Pay
 
     def charged_to
       "#{card_type} (**** **** **** #{card_last4})"
-    end
-
-    def stripe?
-      processor == "stripe"
-    end
-
-    def braintree?
-      processor == "braintree"
-    end
-
-    def paypal?
-      braintree? && card_type == "PayPal"
-    end
-
-    def paddle?
-      processor == "paddle"
     end
   end
 end

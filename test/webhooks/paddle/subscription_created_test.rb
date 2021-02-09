@@ -7,7 +7,7 @@ class Pay::PaddleWebhooksSubscriptionCreatedTest < ActiveSupport::TestCase
   end
 
   test "paddle passthrough" do
-    passthrough = Pay::Paddle.passthrough(owner: @user, foo: :bar)
+    passthrough = Pay::Processors::Paddle.passthrough(owner: @user, foo: :bar)
     parsed = JSON.parse(passthrough)
     assert_equal "bar", parsed["foo"]
     assert_equal @user, GlobalID::Locator.locate_signed(parsed["owner_sgid"])
@@ -15,8 +15,8 @@ class Pay::PaddleWebhooksSubscriptionCreatedTest < ActiveSupport::TestCase
 
   test "a subscription is created" do
     assert_difference "Pay.subscription_model.count" do
-      @data["passthrough"] = Pay::Paddle.passthrough(owner: @user)
-      Pay::Paddle::Webhooks::SubscriptionCreated.new(@data)
+      @data["passthrough"] = Pay::Processors::Paddle.passthrough(owner: @user)
+      Pay::Webhooks::Paddle::SubscriptionCreated.new(@data)
     end
 
     assert_equal "paddle", @user.reload.processor
@@ -36,7 +36,7 @@ class Pay::PaddleWebhooksSubscriptionCreatedTest < ActiveSupport::TestCase
     @data["passthrough"] = "does-not-exist"
 
     assert_no_difference "Pay.subscription_model.count" do
-      Pay::Paddle::Webhooks::SubscriptionCreated.new(@data)
+      Pay::Webhooks::Paddle::SubscriptionCreated.new(@data)
     end
   end
 end

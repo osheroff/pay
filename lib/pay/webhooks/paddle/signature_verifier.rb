@@ -8,7 +8,7 @@ module Pay
       class SignatureVerifier
         def initialize(data)
           @data = data
-          @public_key_base64 = Pay::Paddle.public_key_base64
+          @public_key_base64 = Pay::Processors::Paddle.public_key_base64
         end
 
         def verify
