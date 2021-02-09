@@ -1,6 +1,6 @@
 module Pay
   module Processors
-    module Pay
+    module Fake
       class Billable < Processors::Billable
         def customer
           self

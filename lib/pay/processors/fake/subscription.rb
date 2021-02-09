@@ -1,6 +1,6 @@
 module Pay
   module Processors
-    module Pay
+    module Fake
       class Subscription < Processors::Subscription
         def processor_subscription(options = {})
           self

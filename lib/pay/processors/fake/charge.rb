@@ -1,6 +1,6 @@
 module Pay
   module Processors
-    module Pay
+    module Fake
       class Charge < Processors::Charge
         def processor_charge
           self
