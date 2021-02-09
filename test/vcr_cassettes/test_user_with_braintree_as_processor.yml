@@ -1,0 +1,79 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://api.sandbox.braintreegateway.com/merchants/zyfwpztymjqdcc5g/customers
+    body:
+      encoding: UTF-8
+      string: |
+        <?xml version="1.0" encoding="UTF-8"?>
+        <customer>
+          <email>johnny@appleseed.com</email>
+          <first-name nil="true"/>
+          <last-name nil="true"/>
+          <payment-method-nonce nil="true"/>
+        </customer>
+    headers:
+      Accept-Encoding:
+      - gzip
+      Accept:
+      - application/xml
+      User-Agent:
+      - Braintree Ruby Gem 3.2.0
+      X-Apiversion:
+      - '6'
+      Content-Type:
+      - application/xml
+      Authorization:
+      - Basic NXI1OXJyeGhuODlucGM5bjowMGYwZGY3OTMwM2UxMjcwODgxZTVmZWRhNzc4ODkyNw==
+  response:
+    status:
+      code: 201
+      message: ''
+    headers:
+      Date:
+      - Tue, 09 Feb 2021 22:02:30 GMT
+      Content-Type:
+      - application/xml; charset=utf-8
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      X-Authentication:
+      - basic_auth
+      X-User:
+      - k8kdyxqxh8zjnf35
+      Vary:
+      - Accept-Encoding, Origin
+      Content-Encoding:
+      - gzip
+      Etag:
+      - W/"5bd45ade3bdf5f713d44fa0bd3a67f21"
+      Cache-Control:
+      - max-age=0, private, must-revalidate
+      X-Runtime:
+      - '0.190851'
+      X-Request-Id:
+      - 7792dbbe-c442-4b22-97ed-0838454d9a26
+      Content-Security-Policy:
+      - frame-ancestors 'self'
+      X-Broxyid:
+      - 7792dbbe-c442-4b22-97ed-0838454d9a26
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: !binary |-
+        H4sIAHYGI2AAA5RSu27CMBTd+YrIu0kwDwFyQgfUSpXoRKvCdolvgpHtpLYpJF/fBFCplHboeF6+99jmi7NWwSdaJwsTk0E/IgGatBDS5DF5XT/SKVkkPZ4enS802qQXBFyKhE2mo8kwmo552KCWbMR0D8bTBtdVdiprX+nDh0jTcc7Dn2rrzqR1nhrQGBipYuLtEUl4kRT8paSFLsFUHR41SJUcir0x1QOUpUKHKPqNnYdXrXWV+8J0z8zg3OFOuHPS/zLfIngUFHzgqxJjIhropUaSsIgNaMRoNFszNo/YfBhteXgPXPLHUvwvfw9c518egWYSlXDXlXJV7EC1t7oZvtXiaea378/Z6rAZvSw39WqZD3h499xKCOlpCla42xpgLVS3jiCEReewozVtvv/AFwAAAP//AwCF0dYNNgIAAA==
+  recorded_at: Tue, 09 Feb 2021 22:02:30 GMT
+recorded_with: VCR 6.0.0

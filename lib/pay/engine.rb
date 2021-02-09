@@ -15,9 +15,9 @@ module Pay
     end
 
     config.to_prepare do
-      Pay::Stripe.setup if defined? ::Stripe
-      Pay::Braintree.setup if defined? ::Braintree
-      Pay::Paddle.setup if defined? ::PaddlePay
+      Pay::Processors::Stripe.setup if defined? ::Stripe
+      Pay::Processors::Braintree.setup if defined? ::Braintree
+      Pay::Processors::Paddle.setup if defined? ::PaddlePay
 
       Pay.charge_model.include Pay::Receipts if defined? ::Receipts::Receipt
     end

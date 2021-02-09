@@ -4,28 +4,32 @@ module Pay
       class Billable < Processors::Billable
         extend ActiveSupport::Concern
 
-        included do
-          scope :braintree, -> { where(processor: :braintree) }
+        delegate :braintree_id, to: :billable
+
+        def initialize(billable)
+          super
+
+          raise StandardError, "Add Braintree to your Gemfile to use the Braintree payment processor. `bundle add braintree`" unless defined?(::Braintree)
         end
 
         # Handles Billable#customer
         #
         # Returns Braintree::Customer
         def customer
-          if processor_id?
-            gateway.customer.find(processor_id)
+          if braintree_id?
+            gateway.customer.find(braintree_id)
           else
             result = gateway.customer.create(
               email: email,
               first_name: try(:first_name),
               last_name: try(:last_name),
-              payment_method_nonce: card_token
+              payment_method_nonce: billable.payment_method_token
             )
             raise BraintreeError.new(result), result.message unless result.success?
 
-            update(processor: :braintree, processor_id: result.customer.id)
+            billable.update(processor: :braintree, braintree_id: result.customer.id)
 
-            if card_token.present?
+            if billable.payment_method_token.present?
               update_card_on_file result.customer.payment_methods.last
             end
 
@@ -89,7 +93,7 @@ module Pay
         # Returns true if successful
         def update_card(token)
           result = gateway.payment_method.create(
-            customer_id: processor_id,
+            customer_id: braintree_id,
             payment_method_nonce: token,
             options: {
               make_default: true,
@@ -107,8 +111,9 @@ module Pay
           raise BraintreeError, e.message
         end
 
-        def update_email!
-          braintree_customer.update(
+        def sync_customer
+          gateway.customer.update(
+            braintree_id,
             email: email,
             first_name: try(:first_name),
             last_name: try(:last_name)
@@ -162,7 +167,7 @@ module Pay
         def update_card_on_file(payment_method)
           case payment_method
           when ::Braintree::CreditCard
-            update!(
+            billable.update!(
               card_type: payment_method.card_type,
               card_last4: payment_method.last_4,
               card_exp_month: payment_method.expiration_month,
@@ -170,14 +175,14 @@ module Pay
             )
 
           when ::Braintree::PayPalAccount
-            update!(
+            billable.update!(
               card_type: "PayPal",
               card_last4: payment_method.email
             )
           end
 
           # Clear the card token so we don't accidentally update twice
-          self.card_token = nil
+          self.payment_method_token = nil
         end
 
         def card_details_for_transaction(transaction)

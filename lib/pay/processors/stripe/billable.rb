@@ -2,6 +2,8 @@ module Pay
   module Processors
     module Stripe
       class Billable < Processors::Billable
+        delegate :stripe_id, to: :billable
+
         def initialize(billable)
           super
 
@@ -9,8 +11,8 @@ module Pay
         end
 
         def customer
-          if processor_id?
-            ::Stripe::Customer.retrieve(processor_id)
+          if stripe_id?
+            ::Stripe::Customer.retrieve(stripe_id)
           else
             create_customer(name: customer_name, email: email)
           end
@@ -83,36 +85,36 @@ module Pay
 
         # Used for syncing email changes to Stripe
         def sync_customer(**options)
-          Stripe::Customer.update(processor_id, options.merge(email: email, name: customer_name))
+          ::Stripe::Customer.update(stripe_id, options.merge(email: email, name: customer_name))
         end
 
         def create_setup_intent
-          ::Stripe::SetupIntent.create(customer: processor_id, usage: :off_session)
+          ::Stripe::SetupIntent.create(customer: stripe_id, usage: :off_session)
         end
 
         # Create customer and automatically set payment method if set
         def create_customer(name:, email:)
           customer = ::Stripe::Customer.create(email: email, name: name)
-          update(processor: :stripe, processor_id: customer.id)
+          update(processor: :stripe, stripe_id: customer.id)
 
           # Update the user's card on file if a token was passed in
-          if card_token.present?
-            payment_method = ::Stripe::PaymentMethod.attach(card_token, {customer: customer.id})
+          if billable.payment_method_token.present?
+            payment_method = ::Stripe::PaymentMethod.attach(payment_method_token, {customer: customer.id})
             customer.invoice_settings.default_payment_method = payment_method.id
             customer.save
 
-            update_stripe_card_on_file ::Stripe::PaymentMethod.retrieve(card_token).card
+            update_stripe_card_on_file ::Stripe::PaymentMethod.retrieve(payment_method_token).card
           end
 
           customer
         end
 
         def invoice!(options = {})
-          ::Stripe::Invoice.create(options.merge(customer: processor_id)).pay
+          ::Stripe::Invoice.create(options.merge(customer: stripe_id)).pay
         end
 
         def upcoming_invoice
-          ::Stripe::Invoice.upcoming(customer: processor_id)
+          ::Stripe::Invoice.upcoming(customer: stripe_id)
         end
 
         def has_incomplete_payment?(name: "default")
