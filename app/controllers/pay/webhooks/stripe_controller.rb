@@ -8,7 +8,7 @@ module Pay
       def create
         event = verified_event
         klass = class_for_event(event)
-        klass.new.call(event) if klass
+        klass&.new&.call(event)
         head :ok
       rescue ::Stripe::SignatureVerificationError => e
         log_error(e)

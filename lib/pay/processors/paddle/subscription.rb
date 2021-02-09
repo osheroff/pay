@@ -1,8 +1,6 @@
 module Pay
   module Paddle
-    module Subscription
-      extend ActiveSupport::Concern
-
+    class Subscription < Processors::Subscription
       included do
         scope :paddle, -> { where(processor: :paddle) }
 

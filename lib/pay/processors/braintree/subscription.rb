@@ -1,13 +1,7 @@
 module Pay
   module Processors
     module Braintree
-      module Subscription
-        extend ActiveSupport::Concern
-
-        included do
-          scope :braintree, -> { where(processor: :braintree) }
-        end
-
+      class Subscription < Processors::Subscription
         def braintree?
           processor == "braintree"
         end
