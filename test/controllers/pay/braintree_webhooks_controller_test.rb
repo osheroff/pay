@@ -10,11 +10,11 @@ module Pay
 
     test "should handle post requests" do
       post webhooks_braintree_path
-      assert_response :success
+      assert_response :bad_request
     end
 
     test "should parse a braintree webhook" do
-      user = User.create!
+      user = User.create! processor: :braintree
       Pay.subscription_model.create!(
         owner: user,
         processor: :braintree,

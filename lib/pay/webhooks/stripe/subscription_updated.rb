@@ -21,14 +21,14 @@ module Pay
 
           # If user was on trial, their subscription ends at the end of the trial
           subscription.ends_at = if object.cancel_at_period_end && subscription.on_trial?
-                                   subscription.trial_ends_at
+            subscription.trial_ends_at
 
-                                   # User wasn't on trial, so subscription ends at period end
-                                 elsif object.cancel_at_period_end
-                                   Time.at(object.current_period_end)
+          # User wasn't on trial, so subscription ends at period end
+          elsif object.cancel_at_period_end
+            Time.at(object.current_period_end)
 
-                                   # Subscription isn't marked to cancel at period end
-                                 end
+            # Subscription isn't marked to cancel at period end
+          end
 
           subscription.save!
         end

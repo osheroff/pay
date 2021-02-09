@@ -10,15 +10,15 @@ module Pay
         if verifier.verify
           case params["alert_name"]
           when "subscription_created"
-            Pay::Paddle::Webhooks::SubscriptionCreated.new(check_params)
+            Pay::Webhooks::Paddle::SubscriptionCreated.new(check_params)
           when "subscription_updated"
-            Pay::Paddle::Webhooks::SubscriptionUpdated.new(check_params)
+            Pay::Webhooks::Paddle::SubscriptionUpdated.new(check_params)
           when "subscription_cancelled"
-            Pay::Paddle::Webhooks::SubscriptionCancelled.new(check_params)
+            Pay::Webhooks::Paddle::SubscriptionCancelled.new(check_params)
           when "subscription_payment_succeeded"
-            Pay::Paddle::Webhooks::SubscriptionPaymentSucceeded.new(check_params)
+            Pay::Webhooks::Paddle::SubscriptionPaymentSucceeded.new(check_params)
           when "subscription_payment_refunded"
-            Pay::Paddle::Webhooks::SubscriptionPaymentRefunded.new(check_params)
+            Pay::Webhooks::Paddle::SubscriptionPaymentRefunded.new(check_params)
           end
 
           head :ok

@@ -1,3 +1,5 @@
+# This is the main module added to a model to enable payments
+
 module Pay
   module Billable
     extend ActiveSupport::Concern
@@ -34,8 +36,8 @@ module Pay
       @payment_processor ||= payment_processor_for(processor).new(self)
     end
 
-    def payment_process_for(name)
-      "Pay::Processors::#{name.classify}::Billable".constantize
+    def payment_processor_for(name)
+      "Pay::Processors::#{name.to_s.classify}::Billable".constantize
     end
 
     # Reset the payment processor when it changes
