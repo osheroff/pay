@@ -21,7 +21,7 @@ Gem::Specification.new do |s|
     "README.md"
   ]
 
-  s.add_dependency "rails", ">= 4.2"
+  s.add_dependency "rails", ">= 6.0"
 
   s.add_development_dependency "braintree", ">= 2.92.0", "< 4.0"
   s.add_development_dependency "stripe", ">= 2.8"

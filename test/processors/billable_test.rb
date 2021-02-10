@@ -2,7 +2,7 @@ require "test_helper"
 
 class Pay::Billable::Test < ActiveSupport::TestCase
   setup do
-    @billable = User.new email: "gob@bluth.com"
+    @billable = User.new email: "gob@bluth.com", processor: :fake
   end
 
   test "truth" do
@@ -143,15 +143,15 @@ class Pay::Billable::Test < ActiveSupport::TestCase
   end
 
   test "pay invoice" do
-    @billable.processor = "stripe"
+    @billable.processor = :stripe
     @billable.expects(:stripe_invoice!).returns(:invoice)
     assert_equal :invoice, @billable.invoice!
   end
 
   test "get upcoming invoice" do
-    @billable.processor = "stripe"
-    @billable.expects(:stripe_upcoming_invoice).returns(:invoice)
-    assert_equal :invoice, @billable.upcoming_invoice
+    @billable.processor = :stripe
+    Pay::Processors::Stripe.expects(:upcoming_invoice).returns(:invoice)
+    assert_equal :invoice, @billable.payment_processor.upcoming_invoice
   end
 
   test "on_trial? with no plan" do

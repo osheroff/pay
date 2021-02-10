@@ -2,7 +2,7 @@ PATH
   remote: .
   specs:
     pay (2.3.1)
-      rails (>= 4.2)
+      rails (>= 6.0)
 
 GEM
   remote: https://rubygems.org/
@@ -195,9 +195,6 @@ GEM
     standardrb (1.0.0)
       standard
     stripe (5.29.0)
-    stripe_event (2.3.1)
-      activesupport (>= 3.1)
-      stripe (>= 2.8, < 6)
     thor (1.1.0)
     turbolinks (5.2.1)
       turbolinks-source (~> 5.2)
@@ -243,7 +240,6 @@ DEPENDENCIES
   standard
   standardrb
   stripe (>= 2.8)
-  stripe_event (~> 2.3)
   turbolinks
   vcr
   web-console

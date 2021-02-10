@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_06_03_152357) do
+ActiveRecord::Schema.define(version: 2021_02_10_000441) do
 
   create_table "pay_charges", force: :cascade do |t|
     t.string "owner_type"
@@ -57,6 +57,7 @@ ActiveRecord::Schema.define(version: 2020_06_03_152357) do
     t.string "card_exp_month"
     t.string "card_exp_year"
     t.text "extra_billing_info"
+    t.json "pay_data"
     t.index ["owner_type", "owner_id"], name: "index_teams_on_owner"
   end
 
@@ -72,6 +73,7 @@ ActiveRecord::Schema.define(version: 2020_06_03_152357) do
     t.string "card_exp_month"
     t.string "card_exp_year"
     t.text "extra_billing_info"
+    t.json "pay_data"
   end
 
 end
